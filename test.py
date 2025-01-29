@@ -444,4 +444,4 @@ with st.expander("Refine Story"):
                     st.error(f"Error preparing download: {str(e)}")
 
 st.sidebar.markdown("---")
-st.sidebar.info("Built with Streamlit and Hugging Face API.")
+st.sidebar.info("Built by Gianluca Aquilina 348904L")
