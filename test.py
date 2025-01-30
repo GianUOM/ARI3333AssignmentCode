@@ -28,7 +28,6 @@ if "story_params" not in st.session_state:
     }
 
 def clean_generated_text(response_text, prompt):
-    """Cleans the generated text by removing prompts and explanations."""
     if response_text.startswith(prompt):
         response_text = response_text[len(prompt):].strip()
     
@@ -70,7 +69,6 @@ def clean_generated_text(response_text, prompt):
     return response_text.strip()
 
 def generate_story(api_key, prompt, max_tokens):
-    """Generate story with better error handling and feedback."""
     try:
         API_URL = "https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-3B-Instruct"
         headers = {
@@ -122,7 +120,6 @@ def generate_story(api_key, prompt, max_tokens):
         return None
 
 def export_to_pdf(story, genre, tone):
-    """Exports the story to a PDF file."""
     try:
         pdf = FPDF()
         pdf.add_page()
@@ -154,7 +151,6 @@ def export_to_pdf(story, genre, tone):
         return None
 
 def create_prompt(genre, tone, character, setting, word_limit):
-    """Creates a story prompt based on user input."""
     word_limits = {
         "Really short (150 - 300 words)": (150, 300),
         "Short (400 - 600 words)": (400, 600),
@@ -171,7 +167,6 @@ def create_prompt(genre, tone, character, setting, word_limit):
     )
 
 def handle_keep_version(refined_story):
-    """Helper function to handle keeping a new version of the story"""
     try:
         if not refined_story:
             st.error("No refined story to save")
