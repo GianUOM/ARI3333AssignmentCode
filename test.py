@@ -9,18 +9,15 @@ import requests
 import traceback
 import time
 
-# Load environment variables
 load_dotenv()
 API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 if not API_KEY:
     st.error("API Key not found. Please set HUGGINGFACE_API_KEY in your .env file.")
     st.stop()
 
-# Initialize session state for the story
 if "current_story" not in st.session_state:
     st.session_state["current_story"] = ""
 
-# Store original parameters in session state
 if "story_params" not in st.session_state:
     st.session_state.story_params = {
         "genre": "",
@@ -180,14 +177,11 @@ def handle_keep_version(refined_story):
             st.error("No refined story to save")
             return False
             
-        # Debug info
         st.write("Debug - Original story:", st.session_state["current_story"][:100])
         st.write("Debug - New story:", refined_story[:100])
         
-        # Update the story in session state
         st.session_state["current_story"] = refined_story
         
-        # Update story parameters if necessary
         if "story_params" in st.session_state:
             st.session_state.story_params["last_modified"] = datetime.now().isoformat()
         
@@ -197,7 +191,6 @@ def handle_keep_version(refined_story):
         st.error(f"Error saving new version: {str(e)}")
         return False
 
-# Word limits dictionary
 word_limits = {
     "Really short (150 - 300 words)": (150, 300),
     "Short (400 - 600 words)": (400, 600),
@@ -206,11 +199,9 @@ word_limits = {
     "Very long (1300 - 1500 words)": (1300, 1500)
 }
 
-# Streamlit UI setup
 st.title("Creative Story Generator")
 st.sidebar.header("Story Parameters")
 
-# User input fields
 genre = st.sidebar.selectbox("Genre:", [
     "Science Fiction", "Fantasy", "Horror", "Mystery", "Romance", "Adventure", 
     "Historical Fiction", "Thriller", "Drama", "Comedy", "Action"
@@ -224,7 +215,6 @@ character = st.sidebar.text_input("Character:")
 setting = st.sidebar.text_input("Setting:")
 word_limit = st.sidebar.selectbox("Word Limit:", list(word_limits.keys()))
 
-# Generate Story button
 if st.sidebar.button("Generate Story"):
     if not character.strip() or not setting.strip():
         st.warning("Please provide both a character and a setting.")
@@ -244,19 +234,16 @@ if st.sidebar.button("Generate Story"):
             st.session_state["current_story"] = story
             st.success("Story generated successfully!")
 
-# Display the current story and refinement options
 if st.session_state["current_story"]:
     st.markdown("### Generated Story:")
     story_area = st.text_area("Current Story:", st.session_state["current_story"], height=300)
 
-    # Refinement options section
 with st.expander("Refine Story"):
     refine_option = st.radio(
         "What would you like to change?",
         ["Change Tone", "Modify Character", "Other Custom Change"]
     )
 
-    # Option 1: Change Tone
     if refine_option == "Change Tone":
         new_tone = st.selectbox(
             "Select new tone:",
@@ -282,10 +269,10 @@ with st.expander("Refine Story"):
                     refined_story = generate_story(API_KEY, refine_prompt, max_tokens)
                     
                     if refined_story:
-                        # Store the refined story in session state
+                        
                         st.session_state['temp_refined_story'] = refined_story
                         
-                        # Display the refined story
+                       
                         st.markdown("### Refined Story:")
                         st.text_area(
                             "Preview", 
@@ -294,12 +281,12 @@ with st.expander("Refine Story"):
                             key=f"refined_story_preview_{int(time.time())}"
                         )
                         
-                        # Keep version button
+                        
                         col1, col2 = st.columns([1, 4])
                         with col1:
                             if st.button("Keep This Version", key=f"keep_version_{int(time.time())}"):
                                 if handle_keep_version(st.session_state['temp_refined_story']):
-                                    # Update the tone in story parameters
+                            
                                     st.session_state.story_params['tone'] = new_tone
                                     st.success("New version saved!")
                                     time.sleep(0.5)
@@ -311,7 +298,7 @@ with st.expander("Refine Story"):
                 st.error(f"Error during tone refinement: {str(e)}")
                 st.error(traceback.format_exc())
 
-    # Option 2: Modify Character
+    
     elif refine_option == "Modify Character":
         new_character = st.text_input(
             "Describe the new main character:",
@@ -336,10 +323,8 @@ with st.expander("Refine Story"):
                     refined_story = generate_story(API_KEY, refine_prompt, max_tokens)
                     
                     if refined_story:
-                        # Store the refined story in session state
                         st.session_state['temp_refined_story'] = refined_story
                         
-                        # Display the refined story
                         st.markdown("### Refined Story:")
                         st.text_area(
                             "Preview", 
@@ -348,12 +333,10 @@ with st.expander("Refine Story"):
                             key=f"refined_story_preview_{int(time.time())}"
                         )
                         
-                        # Keep version button
                         col1, col2 = st.columns([1, 4])
                         with col1:
                             if st.button("Keep This Version", key=f"keep_version_{int(time.time())}"):
                                 if handle_keep_version(st.session_state['temp_refined_story']):
-                                    # Update the character in story parameters
                                     st.session_state.story_params['character'] = new_character
                                     st.success("New version saved!")
                                     time.sleep(0.5)
@@ -365,7 +348,6 @@ with st.expander("Refine Story"):
                 st.error(f"Error during character refinement: {str(e)}")
                 st.error(traceback.format_exc())
 
-    # Option 3: Custom Change
     else:
         custom_instruction = st.text_area(
             "Describe what changes you'd like to make to the story:",
@@ -395,10 +377,8 @@ with st.expander("Refine Story"):
                     refined_story = generate_story(API_KEY, refine_prompt, max_tokens)
                     
                     if refined_story:
-                        # Store the refined story in session state
                         st.session_state['temp_refined_story'] = refined_story
                         
-                        # Display the refined story
                         st.markdown("### Refined Story:")
                         st.text_area(
                             "Preview", 
@@ -407,12 +387,10 @@ with st.expander("Refine Story"):
                             key=f"refined_story_preview_{int(time.time())}"
                         )
                         
-                        # Keep version button
                         col1, col2 = st.columns([1, 4])
                         with col1:
                             if st.button("Keep This Version", key=f"keep_version_{int(time.time())}"):
                                 if handle_keep_version(st.session_state['temp_refined_story']):
-                                    # Add custom change to story parameters for tracking
                                     st.session_state.story_params['last_custom_change'] = custom_instruction
                                     st.success("New version saved!")
                                     time.sleep(0.5)
@@ -425,7 +403,6 @@ with st.expander("Refine Story"):
                 st.error(traceback.format_exc())
 
 
-    # PDF export button
     if st.button("Export Story to PDF"):
         with st.spinner("Creating PDF..."):
             pdf_file = export_to_pdf(st.session_state["current_story"], genre, tone)
